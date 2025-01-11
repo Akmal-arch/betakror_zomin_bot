@@ -3,7 +3,7 @@ from telebot import types
 import schedule
 import time
 import threading
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import os
 import uuid
@@ -51,6 +51,17 @@ def send_message(schedule_item):
 
 # Schedule job based on type
 def schedule_job(schedule_item):
+    schedule_time = datetime.strptime(schedule_item['time'], '%H:%M').time()
+    now = datetime.now()
+
+    # Adjust to schedule for the next day if the time has already passed today
+    if schedule_time <= now.time():
+        schedule_date = (now + timedelta(days=1)).date()
+    else:
+        schedule_date = now.date()
+
+    schedule_datetime = datetime.combine(schedule_date, schedule_time)
+
     schedule_type = schedule_item['type']
     if schedule_type == 'one_time':
         schedule.every().day.at(schedule_item['time']).do(send_message, schedule_item)
@@ -66,6 +77,9 @@ def schedule_job(schedule_item):
     elif schedule_type == 'one_month_every_other_day':
         for i in range(0, 30, 2):
             schedule.every(i).days.at(schedule_item['time']).do(send_message, schedule_item)
+
+    print(f"Scheduled message for: {schedule_datetime}")
+
 
 # Scheduler thread
 def run_scheduler():
@@ -199,9 +213,9 @@ def status_command(message):
     if str(message.from_user.id) != USER_ID:
         bot.send_message(message.chat.id, "❌ Unauthorized user.")
         return
-    status_message = "📋 Aktiv Rejalashtirilgan Postlar:\n"
+    status_message = "📋 Aktiv Rejalashtirilgan Postlar:\n\n"
     for schedule_item in schedules:
-        status_message += f"📝 Matni: {schedule_item['message']}\n⏰ Jo'natildi: {schedule_item['sent']}/{schedule_item['max_sends']}\n\n"
+        status_message += f"📝 Matni: {schedule_item['message']}\n\n\n⏰Vaqti: {schedule_item['time']} \n📬 Jo'natildi: {schedule_item['sent']}/{schedule_item['max_sends']}\n\n"
     bot.send_message(message.chat.id, status_message or "Aktiv postlar yoq.")
 
 # Main entry point
