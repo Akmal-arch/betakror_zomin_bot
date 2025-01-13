@@ -222,4 +222,4 @@ def status_command(message):
 if __name__ == '__main__':
     load_schedules()
     threading.Thread(target=run_scheduler).start()
-    bot.polling(none_stop=True)
+    bot.infinity_polling(timeout=10, long_polling_timeout = 5)
