@@ -7,24 +7,15 @@ from datetime import datetime, timedelta
 import json
 import os
 import uuid
-from flask import Flask, request
-
 
 API_TOKEN = '7152711739:AAH4qQxkqJrha_jL1tY1nvswRFePg1w21nE'
 USER_ID = '1992943760'
 CHANNEL_ID = '-1001141083846'
 
 bot = telebot.TeleBot(API_TOKEN)
-app = Flask(__name__)
 
 schedules = []
 ads_data = {}
-
-@app.route('/bot', methods=['POST'])
-def webhook():
-    json_data = request.get_json()
-    bot.process_new_updates([telebot.types.Update.de_json(json_data)])
-    return '', 200
 
 # Load and save schedules to JSON file
 def save_schedules():
@@ -228,13 +219,7 @@ def status_command(message):
     bot.send_message(message.chat.id, status_message or "Aktiv postlar yoq.")
 
 # Main entry point
-if __name__ == "__main__":
+if __name__ == '__main__':
     load_schedules()
     threading.Thread(target=run_scheduler).start()
-
-    # Remove old webhook and set a new one
-    bot.remove_webhook()
-    bot.set_webhook(url='https://akmal.alwaysdata.net/bot')
-
-    # Run Flask app
-    app.run(host="0.0.0.0", port=5555)
+    bot.infinity_polling(timeout=10, long_polling_timeout = 5)
