@@ -8,9 +8,9 @@ import json
 import os
 import uuid
 
-API_TOKEN = '7152711739:AAH4qQxkqJrha_jL1tY1nvswRFePg1w21nE'
-USER_ID = '1992943760'
-CHANNEL_ID = '-1001141083846'
+API_TOKEN = '7420518742:AAGdjCDmc4vD7e8CHrBd21VuMxSDagswcUA'
+USER_ID = '6007504463'
+CHANNEL_ID = '-1002313813064'
 
 bot = telebot.TeleBot(API_TOKEN)
 
